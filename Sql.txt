@@ -1,0 +1,143 @@
+
+Show the first_name, last_name, and height of the patient with the greatest height.
+
+SELECT
+  first_name,
+  last_name,
+  MAX(height)
+FROM patients
+
+Show first and last name, allergies from patients which have allergies to either 'Penicillin' or 'Morphine'. Show results ordered ascending by allergies then by --first_name then by last_name.
+SELECT
+  first_name,
+  last_name,
+  allergies
+FROM patients
+WHERE
+  allergies = 'Penicillin'
+  or allergies = 'Morphine'
+ORDER BY
+  allergies,
+  first_name,
+  last_name
+
+Show all columns for patients who have one of the following patient_ids:
+1,45,534,879,1000
+
+select  * from patients where patient_id in(1,45,534,879,1000)
+
+
+
+Show the difference between the largest weight and smallest weight for patients with the last name 'Maroni'
+
+SELECT mAX(weight) - MIN (weight)
+FROM patients
+WHERE last_name = 'Maroni'
+
+
+--Show how many patients have a birth_date with 2010 as the birth year.
+
+SELECT COUNT (*)
+FROM patients
+WHERE STRFTIME ('%Y', birth_date) = '2010'
+
+--Show the total amount of male patients and the total amount of female patients in the patients table
+
+SELECT (
+    SELECT COUNT(*) AS male_count
+    FROM patients
+    WHERE gender = "M"
+  ), (
+    SELECT COUNT(*) AS female_count
+    FROM patients
+    WHERE gender = "F"
+  )
+
+Show first name, last name and role of every person that is either patient or doctor.
+The roles are either "Patient" or "Doctor"
+
+SELECT
+  first_name,
+  last_name,
+ 
+  'Patient' AS Role
+FROM patients
+UNION
+SELECT
+  first_name,
+  last_name,
+  
+  'Doctor' AS Role
+FROM doctors
+
+
+Show patient_id, diagnosis from admissions. Find patients admitted multiple times for the same diagnosis.
+
+
+SELECT
+  patient_id,
+  primary_diagnosis
+FROM admissions
+GROUP BY
+  patient_id,
+
+
+Show patient_id and first_name from patients where their first_name start and ends with 's' and is at least 6 characters long.
+
+SELECT
+  patient_id,
+  first_name
+FROM patients
+WHERE first_name LIKE 's____%s'
+  primary_diagnosis
+HAVING COUNT(primary_diagnosis) > 1
+
+
+Show unique birth years from patients and order them by ascending.
+
+
+SELECT
+  DISTINCT (YEAR(birth_date)) AS birth_year
+FROM patients
+ORDER BY birth_year
+
+
+Give each patient a 'Yes' if they have insurance, and a 'No' if they don't have insurance. Add up the admission_total cost for each has_insurance group.
+
+
+SELECT
+  'Yes' AS has_insurance,
+  COUNT (*) * 10 cost_after_insurance
+FROM admissions
+WHERE patient_id % 2 = 0
+UNION
+SELECT
+  'No' AS has_insurance,
+  COUNT (*) * 50 cost_after_insurance
+FROM admissions
+WHERE patient_id % 2 != 0
+
+
+Show all allergies ordered by popularity. Remove 'NKA' and NULL values from query.
+
+SELECT
+  allergies,
+  COUNT (allergies) as Total
+FROM patients
+WHERE
+  allergies IS NOT NULL
+  and allergies IS NOT 'NKA'
+GROUP BY allergies
+ORDER BY Total DESC
+
+
+Show patient_id, first_name, last_name from patients whos diagnosis is 'Dementia'.
+
+Primary diagnosis is stored in the admissions table.
+SELECT
+  p.patient_id,
+  p.first_name,
+  p.last_name
+FROM patients AS p
+  INNER JOIN admissions AS a ON p.patient_id = a.patient_id
+WHERE a.primary_diagnosis = 'Dementia'
